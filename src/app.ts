@@ -2,16 +2,43 @@ import cors from "cors";
 import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import http from "http";
+import { json } from "body-parser";
 
 const DEFAULT_PATH = "../server";
 const app = express();
 
-app.get("/directory", async (req: Request, res: Response) => {
-  const directoryPath = (req.query.path as string) || DEFAULT_PATH;
-  const root = await createDirectoryTree(directoryPath, req.protocol, req.get("host"));
-  res.set("Access-Control-Allow-Origin", "http://localhost:4200");
-  res.json(root);
-});
+const typeDefs = `#graphql
+type Entry {
+    name: String!
+    path: String!
+    size: Int!
+    extension: String!
+    createdAt: String!
+    isDirectory: Boolean!
+    link: String!
+    depth: Int!
+    children: [Entry]!
+  }
+
+  type Query {
+    directory(path: String!): Entry!
+  }
+`;
+
+const resolvers = {
+  Query: {
+    directory: async (_: any, { path }: { path: string }) => {
+      const protocol = "http"; // Replace with your desired protocol
+      const host = "localhost:3000"; // Replace with your actual host
+
+      return await createDirectoryTree(path, protocol, host);
+    },
+  },
+};
 
 const createDirectoryTree = async (directoryPath: string, protocol: string, host: string) => {
   const stats = await fs.promises.stat(directoryPath);
@@ -58,14 +85,44 @@ export const getEntryLink = (entryPath: string, protocol: string, host: string) 
   return `${protocol}://${host}/directory?path=${encodeURIComponent(entryPath)}`;
 };
 
-const port = 3000;
+// Create an instance of ApolloServer
+// Create an Express app and apply ApolloServer middleware
+const main = async () => {
+  const httpServer = http.createServer(app);
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
+  await server.start();
 
-app.use(
-  cors({
-    origin: "http://localhost:4200/",
-  })
-);
+  app.use(
+    "/graphql",
+    cors<cors.CorsRequest>(),
+    json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => ({ token: req.headers.token }),
+    })
+  );
 
-app.listen(port, () => {
-  console.log(`API server is running on port ${port}`);
-});
+  app.get("/directory", async (req: Request, res: Response) => {
+    const directoryPath = (req.query.path as string) || DEFAULT_PATH;
+    const root = await createDirectoryTree(directoryPath, req.protocol, req.get("host"));
+    res.set("Access-Control-Allow-Origin", "http://localhost:4200");
+    res.json(root);
+  });
+
+  const port = 3000;
+
+  app.use(
+    cors({
+      origin: "http://localhost:4200/",
+    })
+  );
+
+  app.listen({ port: 3000 }, () => {
+    console.log(`Server is running on http://localhost:${port}, GraphQL on http://localhost:${port}/graphql `);
+  });
+};
+
+main();
