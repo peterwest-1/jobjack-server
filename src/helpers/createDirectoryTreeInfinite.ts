@@ -5,7 +5,11 @@ import { EntryData } from "../types";
 
 //Probably doesnt even work
 // not good as it uses loads everything
-const createDirectoryTreeInfinite = (directoryPath: string, protocol: string, host: string): Promise<EntryData> => {
+export const createDirectoryTreeInfinite = (
+  directoryPath: string,
+  protocol: string,
+  host: string
+): Promise<EntryData> => {
   return new Promise((resolve, reject) => {
     fs.stat(directoryPath, (err, stats) => {
       if (err) {

@@ -33,9 +33,19 @@ file permissions/attribute information
 
 ```
 
+## Questions
+
+- [ ] Should the API give all the contents? Or incremental?
+  - i.e. Should it render the entire directory
+
+## GraphQL
+
+- [ ] If time is available, use GraphQL
+
 ## Issues
 
 - [x] root node createdAt always changes?
+- [ ] Crashes if the directory is `/`
 
 ## Developement Run
 
