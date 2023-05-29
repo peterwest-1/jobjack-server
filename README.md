@@ -30,6 +30,13 @@ file size
 extennsion/file type
 created date
 file permissions/attribute information
+
+```
+
+## Developement Run
+
+```
+npm run watch && npm run dev
 ```
 
 ## Deploy
