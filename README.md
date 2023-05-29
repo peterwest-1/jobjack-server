@@ -45,8 +45,12 @@ npm run watch && npm run dev
 
 ## Deploy
 
+```
 docker build . -t peterwest86/jobjack-server
+```
 
 ## Run
 
+```
 docker run -p 3000:3000 -d peterwest86/jobjack-server:latest
+```
