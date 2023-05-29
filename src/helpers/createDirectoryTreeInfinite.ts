@@ -1,19 +1,11 @@
-import express, { Request, Response } from "express";
 import fs, { Stats } from "fs";
 import path from "path";
-import { EntryData } from "./types";
+import { getEntryLink } from "../app";
+import { EntryData } from "../types";
 
-const DEFAULT_PATH = "../server/src";
-const app = express();
-
-app.get("/directory", async (req, res) => {
-  const directoryPath = (req.query.path as string) || DEFAULT_PATH;
-  const root = await createDirectoryTree(directoryPath, req.protocol, req.get("host"));
-
-  res.json(root);
-});
-
-const createDirectoryTree = (directoryPath: string, protocol: string, host: string): Promise<EntryData> => {
+//Probably doesnt even work
+// not good as it uses loads everything
+const createDirectoryTreeInfinite = (directoryPath: string, protocol: string, host: string): Promise<EntryData> => {
   return new Promise((resolve, reject) => {
     fs.stat(directoryPath, (err, stats) => {
       if (err) {
@@ -53,32 +45,45 @@ const createDirectoryTree = (directoryPath: string, protocol: string, host: stri
 
         Promise.all(statsPromises)
           .then((statsArray) => {
-            const entriesData: EntryData[] = entries.map((entry, index) => {
+            const entryPromises: Promise<EntryData>[] = entries.map((entry, index) => {
               const stats = statsArray[index];
-              const isDirectory = stats.isDirectory();
               const entryData: EntryData = {
                 name: entry,
                 path: path.join(directoryPath, entry),
                 size: stats.size,
                 extension: path.extname(entry),
                 createdAt: stats.birthtime,
-                isDirectory: isDirectory,
+                isDirectory: stats.isDirectory(),
                 link: getEntryLink(path.join(directoryPath, entry), protocol, host),
               };
-              return entryData;
+
+              if (entryData.isDirectory) {
+                return createDirectoryTreeInfinite(entryData.path, protocol, host).then((childDirectory) => {
+                  entryData.children = [childDirectory];
+                  return entryData;
+                });
+              } else {
+                return Promise.resolve(entryData);
+              }
             });
 
-            const directoryTree: EntryData = {
-              name: path.basename(directoryPath),
-              path: directoryPath,
-              isDirectory: true,
-              link: getEntryLink(directoryPath, protocol, host),
-              size: 0,
-              extension: "",
-              createdAt: stats.birthtime,
-              children: entriesData,
-            };
-            resolve(directoryTree);
+            Promise.all(entryPromises)
+              .then((entriesData) => {
+                const directoryTree: EntryData = {
+                  name: path.basename(directoryPath),
+                  path: directoryPath,
+                  isDirectory: true,
+                  link: getEntryLink(directoryPath, protocol, host),
+                  size: 0,
+                  extension: "",
+                  createdAt: stats.birthtime,
+                  children: entriesData,
+                };
+                resolve(directoryTree);
+              })
+              .catch((err) => {
+                reject(err);
+              });
           })
           .catch((err) => {
             reject(err);
@@ -87,13 +92,3 @@ const createDirectoryTree = (directoryPath: string, protocol: string, host: stri
     });
   });
 };
-
-export const getEntryLink = (entryPath: string, protocol: string, host: string) => {
-  return `${protocol}://${host}/directory?path=${encodeURIComponent(entryPath)}`;
-};
-
-const port = 3000;
-
-app.listen(port, () => {
-  console.log(`API server is running on port ${port}`);
-});

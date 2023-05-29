@@ -3,7 +3,7 @@ export interface EntryData {
   path: string;
   size: number;
   extension: string;
-  createdDate: Date;
+  createdAt: Date;
   isDirectory: boolean;
   link: string;
   children?: EntryData[];
