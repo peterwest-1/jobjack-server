@@ -8,45 +8,13 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
-// const directoryPath = "./dummy/"; // Replace with the directory path you want to list
-const directoryPath = "../server/src/";
-
 app.get("/directory", (req, res) => {
-  const files = [];
-
-  const processEntry = (entryPath) => {
-    const stats = fs.statSync(entryPath);
-    const entry = {
-      filename: path.basename(entryPath),
-      path: entryPath,
-      size: stats.size,
-      extension: path.extname(entryPath),
-      isDirectory: stats.isDirectory(),
-      createdDate: stats.birthtime,
-    };
-    files.push(entry);
-
-    if (stats.isDirectory()) {
-      const subEntries = fs.readdirSync(entryPath);
-      subEntries.forEach((subEntry) => {
-        const subEntryPath = path.join(entryPath, subEntry);
-        processEntry(subEntryPath);
-      });
-    }
-  };
-
-  processEntry(directoryPath);
-
-  res.json(files);
-});
-
-app.get("/dir1", (req, res) => {
-  const root = createDirectoryTree(directoryPath);
-
+  const directoryPath = req.query.path || "../server/src"; // Default directory path if not provided
+  const root = createDirectoryTree(directoryPath, req.protocol, req.get("host"));
   res.json(root);
 });
 
-const createDirectoryTree = (directoryPath) => {
+const createDirectoryTree = (directoryPath, protocol, host) => {
   const stats = fs.statSync(directoryPath);
   const entry = {
     name: path.basename(directoryPath),
@@ -55,6 +23,7 @@ const createDirectoryTree = (directoryPath) => {
     extension: path.extname(directoryPath),
     createdDate: stats.birthtime,
     isDirectory: stats.isDirectory(),
+    link: getEntryLink(directoryPath, protocol, host),
     children: [],
   };
 
@@ -62,12 +31,16 @@ const createDirectoryTree = (directoryPath) => {
     const subEntries = fs.readdirSync(directoryPath);
     subEntries.forEach((subEntry) => {
       const subEntryPath = path.join(directoryPath, subEntry);
-      const child = createDirectoryTree(subEntryPath);
+      const child = createDirectoryTree(subEntryPath, protocol, host);
       entry.children.push(child);
     });
   }
 
   return entry;
+};
+
+const getEntryLink = (entryPath, protocol, host) => {
+  return `${protocol}://${host}/directory?path=${encodeURIComponent(entryPath)}`;
 };
 
 const port = 3000; // Replace with the desired port number
