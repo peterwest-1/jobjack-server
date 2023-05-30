@@ -22,8 +22,8 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
     - name: Build the Docker image
       run: |
-        updated=$(date +%s)
-        docker build . -t $DOCKER_USER/jobjack-server:$updated
-        docker tag $DOCKER_USER/jobjack-server:$updated $DOCKER_USER/jobjack-server:latest
+
+        docker build . -t $DOCKER_USER/jobjack-server:$(date +%s)
+        docker tag $DOCKER_USER/jobjack-server:$(date +%s) $DOCKER_USER/jobjack-server:latest
     - name: Docker Push
-      run: docker push peterwest86/jobjack-server
+      run: docker push $DOCKER_USER/jobjack-server
