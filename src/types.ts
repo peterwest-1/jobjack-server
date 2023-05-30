@@ -9,5 +9,4 @@ export interface EntryData {
   children?: EntryData[];
   hasChildren?: boolean;
   permissions?: string;
-  permissionsOctal?: string;
 }
