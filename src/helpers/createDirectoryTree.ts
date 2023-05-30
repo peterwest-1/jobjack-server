@@ -1,5 +1,6 @@
 import fs, { type Stats } from "fs";
 import path from "path";
+import { constants } from "fs";
 import { getEntryLink } from "./getEntryLink";
 import { EntryData } from "../types";
 
@@ -20,6 +21,7 @@ export const createDirectoryTree = async (
         size: 0,
         extension: "",
         createdAt: stats.birthtime,
+        permissions: (stats.mode & constants.S_IRWXU) >> 6,
       };
     }
 
@@ -36,6 +38,7 @@ export const createDirectoryTree = async (
         extension: path.extname(entry),
         createdAt: stats.birthtime,
         isDirectory: isDirectory,
+        permissions: (stats.mode & constants.S_IRWXU) >> 6, // Extract user permission
         link: getEntryLink(path.join(directoryPath, entry), protocol, host),
       };
     });
@@ -48,6 +51,7 @@ export const createDirectoryTree = async (
       size: 0,
       extension: "",
       createdAt: stats.birthtime,
+      permissions: (stats.mode & constants.S_IRWXU) >> 6, // Extract user permissions
       children: entriesData,
     };
   } catch (err) {

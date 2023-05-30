@@ -8,4 +8,5 @@ export interface EntryData {
   link: string;
   children?: EntryData[];
   hasChildren?: boolean;
+  permissions?: number;
 }

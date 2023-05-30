@@ -1,15 +1,16 @@
 # Develop a Node.JS API that allows a client app to:
 
+## TODO
+
+- [ ] Add the file permissions/attribute information to the results.
+
 ## Features Needed
 
 - Obtain the full directory listing of a given directory path on the local filesystem of the host machine where the API is running.
-
-  - [x] Will it be given as a parameter or will it be a fixed path?
-  - [ ] Will be parameter as the
-
 - Include the filename, full path, file size, extension/file type and created date in the result and cater for a large directory size ( at least 100 000).
 
   - [ ] Pagination?
+  - [ ] Caching?
 
 - Add the file permissions/attribute information to the results.
 
@@ -17,20 +18,17 @@
 
 - A directory should be selectable and update the results with the newly selected directory path.
 
-  - [ ] Selectable? Give a link to the directory?
-
 - Make sure the application is containerized and can run on any system. REST or GraphQL can be used. We are a GraphQL company, but if you are unfamiliar with the subject matter, it is advisable that you use what you know best.
 
 Model
 
-```
-filename
-full path
-file size
-extennsion/file type
-created date
-file permissions/attribute information
-
+```ts
+name: string;
+path: string;
+size: number;
+extension: string;
+createdAt: string;
+permissions: string;
 ```
 
 ## Questions
@@ -45,7 +43,7 @@ file permissions/attribute information
 ## Issues
 
 - [x] root node createdAt always changes?
-- [ ] Crashes if the directory is `/`
+- [x] Crashes if the directory is `/`
 
 ## Developement Run
 
