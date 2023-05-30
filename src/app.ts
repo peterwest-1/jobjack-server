@@ -1,9 +1,13 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
 import { createDirectoryTree } from "./helpers/createDirectoryTree";
+import NodeCache from "node-cache";
 
 const DEFAULT_PATH = "../server";
 const app = express();
+
+//In-memory cache
+const cache = new NodeCache();
 
 app.use(
   cors({
@@ -16,12 +20,20 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.get("/directory", async (req: Request, res: Response) => {
   const directoryPath = (req.query.path as string) || DEFAULT_PATH;
-  try {
-    const root = await createDirectoryTree(directoryPath, req.protocol, req.get("host"));
-    res.json(root);
-  } catch (error) {
-    //TODO: maker better
-    res.status(500).json("Fix this:" + error);
+
+  const cachedListing = cache.get(directoryPath);
+
+  if (cachedListing) {
+    res.json(cachedListing);
+  } else {
+    try {
+      const root = await createDirectoryTree(directoryPath, req.protocol, req.get("host"));
+      cache.set(directoryPath, root, 60 * 60); // 1 hour;
+      res.json(root);
+    } catch (error) {
+      //TODO: maker better
+      res.status(500).json("Fix this:" + error);
+    }
   }
 });
 
