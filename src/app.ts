@@ -12,42 +12,9 @@ import { buildSchema } from "type-graphql";
 
 const app = express();
 
-/*
-const typeDefs = `#graphql
-type Entry {
-    name: String!
-    path: String!
-    size: Int!
-    extension: String!
-    createdAt: String!
-    isDirectory: Boolean!
-    link: String!
-    depth: Int!
-    children: [Entry]!
-  }
-
-  type Query {
-    directory(path: String!): Entry!
-  }
-`;
-
-const resolvers = {
-  Query: {
-    directory: async (_: any, { path }: { path: string }) => {
-      const protocol = "http"; // Replace with your desired protocol
-      const host = "localhost:3000"; // Replace with your actual host
-
-      return await createDirectoryTree(path, protocol, host);
-    },
-  },
-};
-*/
-
-export const resolvers = [EntryResolver] as const;
-
-// Create an instance of ApolloServer
-// Create an Express app and apply ApolloServer middleware
 const main = async () => {
+  const resolvers = [EntryResolver] as const;
+
   const schema = await buildSchema({
     resolvers,
   });

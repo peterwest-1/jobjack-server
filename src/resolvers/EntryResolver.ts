@@ -3,7 +3,7 @@ import { EntryData } from "../models/Entry";
 import { MyContext } from "../types";
 import { createDirectoryTree } from "../helpers/createDirectoryTree";
 
-const DEFAULT_PATH = "../server";
+const DEFAULT_PATH = "./";
 
 @Resolver()
 export class EntryResolver {
