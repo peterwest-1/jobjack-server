@@ -1,7 +1,7 @@
 import fs, { Stats } from "fs";
 import path from "path";
-import { getEntryLink } from "../app";
 import { EntryData } from "../types";
+import { getEntryLink } from "./getEntryLink";
 
 //Probably doesnt even work
 // not good as it uses loads everything
