@@ -1,8 +1,7 @@
-import fs, { type Stats } from "fs";
+import fs from "fs";
 import path from "path";
-import { constants } from "fs";
-import { getEntryLink } from "./getEntryLink";
 import { EntryData } from "../types";
+import { createEntry } from "./createEntry";
 
 export const createDirectoryTree = async (
   directoryPath: string,
@@ -13,16 +12,7 @@ export const createDirectoryTree = async (
     const stats = await fs.promises.stat(directoryPath);
 
     if (!stats.isDirectory()) {
-      return {
-        name: path.basename(directoryPath),
-        path: directoryPath,
-        isDirectory: false,
-        link: getEntryLink(directoryPath, protocol, host),
-        size: 0,
-        extension: "",
-        createdAt: stats.birthtime,
-        permissions: (stats.mode & constants.S_IRWXU) >> 6,
-      };
+      return createEntry(directoryPath, protocol, host, stats);
     }
 
     const entries = await fs.promises.readdir(directoryPath);
@@ -30,30 +20,11 @@ export const createDirectoryTree = async (
 
     const entriesData: EntryData[] = entries.map((entry, index) => {
       const stats = statsArray[index];
-      const isDirectory = stats.isDirectory();
-      return {
-        name: entry,
-        path: path.join(directoryPath, entry),
-        size: stats.size,
-        extension: path.extname(entry),
-        createdAt: stats.birthtime,
-        isDirectory: isDirectory,
-        permissions: (stats.mode & constants.S_IRWXU) >> 6, // Extract user permission
-        link: getEntryLink(path.join(directoryPath, entry), protocol, host),
-      };
+
+      return createEntry(directoryPath, protocol, host, stats, entry);
     });
 
-    return {
-      name: path.basename(directoryPath),
-      path: directoryPath,
-      isDirectory: true,
-      link: getEntryLink(directoryPath, protocol, host),
-      size: 0,
-      extension: "",
-      createdAt: stats.birthtime,
-      permissions: (stats.mode & constants.S_IRWXU) >> 6, // Extract user permissions
-      children: entriesData,
-    };
+    return createEntry(directoryPath, protocol, host, stats, null, entriesData);
   } catch (err) {
     throw err;
   }

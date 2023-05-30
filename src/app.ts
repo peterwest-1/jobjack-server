@@ -8,6 +8,7 @@ const app = express();
 
 //In-memory cache
 const cache = new NodeCache();
+const CACHE_TTL = 60 * 60; // 1 hour;
 
 app.use(
   cors({
@@ -28,7 +29,7 @@ app.get("/directory", async (req: Request, res: Response) => {
   } else {
     try {
       const root = await createDirectoryTree(directoryPath, req.protocol, req.get("host"));
-      cache.set(directoryPath, root, 60 * 60); // 1 hour;
+      cache.set(directoryPath, root, CACHE_TTL);
       res.json(root);
     } catch (error) {
       //TODO: maker better
