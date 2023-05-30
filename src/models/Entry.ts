@@ -27,4 +27,7 @@ export class EntryData {
 
   @Field({ nullable: true })
   hasChildren?: boolean;
+
+  @Field({ nullable: true })
+  permissions?: boolean;
 }
