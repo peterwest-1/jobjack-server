@@ -3,11 +3,10 @@ import express, { Request, Response } from "express";
 import { createDirectoryTree } from "./helpers/createDirectoryTree";
 import NodeCache from "node-cache";
 
-const DEFAULT_PATH = "../server";
+const DEFAULT_PATH = "./";
 const app = express();
 
-//In-memory cache
-const cache = new NodeCache();
+const cache = new NodeCache(); //In-memory cache
 const CACHE_TTL = 60 * 60; // 1 hour;
 
 app.use(
@@ -32,7 +31,6 @@ app.get("/directory", async (req: Request, res: Response) => {
       cache.set(directoryPath, root, CACHE_TTL);
       res.json(root);
     } catch (error) {
-      //TODO: maker better
       res.status(500).json("Fix this:" + error);
     }
   }
