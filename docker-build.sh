@@ -13,6 +13,7 @@ if [[ -z $(git status --porcelain) ]]; then
 
     # You can use the $newVersion variable in your script as needed
     docker build . -t peterwest86/jobjack-server:$newVersion
+    docker tag peterwest86/jobjack-server:$newVersion peterwest86/jobjack-server:latest
 else
    echo "Working directory not clean"
 fi
