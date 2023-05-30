@@ -22,9 +22,9 @@ export class EntryData {
   @Field()
   link: string;
 
-  @Field(() => [EntryData])
+  @Field(() => [EntryData], { nullable: true })
   children?: EntryData[];
 
-  @Field()
+  @Field({ nullable: true })
   hasChildren?: boolean;
 }
