@@ -10,6 +10,7 @@ export interface EntryData {
   link: string;
   children?: EntryData[];
   hasChildren?: boolean;
+  permissions?: string;
 }
 
 export interface MyContext {

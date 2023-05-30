@@ -1,1 +1,1 @@
-docker build . -t peterwest86/jobjack-server
+docker build . -t peterwest86/jobjack-server:rest

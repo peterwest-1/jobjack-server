@@ -13,6 +13,7 @@ export const createDirectoryTree = async (
     const stats = await fs.promises.stat(directoryPath);
 
     if (!stats.isDirectory()) {
+
       return {
         name: path.basename(directoryPath),
         path: directoryPath,
@@ -22,6 +23,7 @@ export const createDirectoryTree = async (
         extension: "",
         createdAt: stats.birthtime,
       };
+
     }
 
     const entries = await fs.promises.readdir(directoryPath);
@@ -51,6 +53,7 @@ export const createDirectoryTree = async (
       createdAt: stats.birthtime,
       children: entriesData,
     };
+
   } catch (err) {
     throw err;
   }
