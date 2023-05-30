@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: docker login
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -22,8 +22,8 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
     - name: Build the Docker image
       run: |
-
-        docker build . -t ${{secrets.DOCKER_USER}}/jobjack-server:$(date +%s)
-        docker tag ${{secrets.DOCKER_USER}}/jobjack-server:$(date +%s) ${{secrets.DOCKER_USER}}/jobjack-server:latest
+        updated=$(date +%s)
+        docker build . -t ${{secrets.DOCKER_USER}}/jobjack-server:$updated
+        docker tag ${{secrets.DOCKER_USER}}/jobjack-server:$updated ${{secrets.DOCKER_USER}}/jobjack-server:latest
     - name: Docker Push
       run: docker push ${{secrets.DOCKER_USER}}/jobjack-server
