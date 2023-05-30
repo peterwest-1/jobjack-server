@@ -23,7 +23,7 @@ jobs:
     - name: Build the Docker image
       run: |
         updated=$(date +%s)
-        docker build . -t peterwest86/jobjack-server:$updated
-        docker tag peterwest86/jobjack-server:$updated peterwest86/jobjack-server:latest
+        docker build . -t $DOCKER_USER/jobjack-server:$updated
+        docker tag $DOCKER_USER/jobjack-server:$updated $DOCKER_USER/jobjack-server:latest
     - name: Docker Push
       run: docker push peterwest86/jobjack-server
