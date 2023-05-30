@@ -1,3 +1,5 @@
+import { Request, Response } from "express";
+
 export interface EntryData {
   name: string;
   path: string;
@@ -9,4 +11,9 @@ export interface EntryData {
   children?: EntryData[];
   hasChildren?: boolean;
   permissions?: string;
+}
+
+export interface MyContext {
+  req: Request;
+  res: Response;
 }

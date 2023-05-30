@@ -1,43 +1,48 @@
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { json } from "body-parser";
 import cors from "cors";
-import express, { Request, Response } from "express";
-import { createDirectoryTree } from "./helpers/createDirectoryTree";
-import NodeCache from "node-cache";
+import express from "express";
+import http from "http";
+import "reflect-metadata";
+import { EntryResolver } from "./resolvers/EntryResolver";
+import { MyContext } from "./types";
+import { buildSchema } from "type-graphql";
 
-const DEFAULT_PATH = "./";
 const app = express();
 
-const cache = new NodeCache(); //In-memory cache
-const CACHE_TTL = 60 * 60; // 1 hour;
+const main = async () => {
+  const resolvers = [EntryResolver] as const;
 
-app.use(
-  cors({
-    origin: ["http://localhost:4200"],
-  })
-);
-app.get("/", async (req: Request, res: Response) => {
-  res.send("JobJack-Server-REST");
-});
+  const schema = await buildSchema({
+    resolvers,
+  });
 
-app.get("/directory", async (req: Request, res: Response) => {
-  const directoryPath = (req.query.path as string) || DEFAULT_PATH;
+  const httpServer = http.createServer(app);
+  const server = new ApolloServer<MyContext>({
+    schema,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
 
-  const cachedListing = cache.get(directoryPath);
+  await server.start();
 
-  if (cachedListing) {
-    res.json(cachedListing);
-  } else {
-    try {
-      const root = await createDirectoryTree(directoryPath, req.protocol, req.get("host"));
-      cache.set(directoryPath, root, CACHE_TTL);
-      res.json(root);
-    } catch (error) {
-      res.status(500).json("Fix this:" + error);
-    }
-  }
-});
+  app.use(
+    "/graphql",
+    cors<cors.CorsRequest>({
+      origin: ["http://localhost:4200", "https://studio.apollographql.com"],
+    }),
+    json(),
+    expressMiddleware(server, {
+      context: async ({ req, res }) => ({ req, res }),
+    })
+  );
 
-const port = 3000;
+  const port = 3000;
 
-app.listen(port, () => {
-  console.log(`JobJack-Server-REST is running on port ${port}`);
-});
+  app.listen({ port: 3000 }, () => {
+    console.log(`Server is running on http://localhost:${port}, GraphQL on http://localhost:${port}/graphql `);
+  });
+};
+
+main();

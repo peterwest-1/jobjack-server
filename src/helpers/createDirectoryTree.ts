@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { EntryData } from "../types";
-import { createEntry } from "./createEntry";
+import "reflect-metadata";
+import { getEntryLink } from "./getEntryLink";
+import { EntryData } from "../models/Entry";
 
 export const createDirectoryTree = async (
   directoryPath: string,
@@ -12,7 +13,17 @@ export const createDirectoryTree = async (
     const stats = await fs.promises.stat(directoryPath);
 
     if (!stats.isDirectory()) {
-      return createEntry(directoryPath, protocol, host, stats);
+
+      return {
+        name: path.basename(directoryPath),
+        path: directoryPath,
+        isDirectory: false,
+        link: getEntryLink(directoryPath, protocol, host),
+        size: 0,
+        extension: "",
+        createdAt: stats.birthtime,
+      };
+
     }
 
     const entries = await fs.promises.readdir(directoryPath);
@@ -20,11 +31,29 @@ export const createDirectoryTree = async (
 
     const entriesData: EntryData[] = entries.map((entry, index) => {
       const stats = statsArray[index];
-
-      return createEntry(directoryPath, protocol, host, stats, entry);
+      const isDirectory = stats.isDirectory();
+      return {
+        name: entry,
+        path: path.join(directoryPath, entry),
+        size: stats.size,
+        extension: path.extname(entry),
+        createdAt: stats.birthtime,
+        isDirectory: isDirectory,
+        link: getEntryLink(path.join(directoryPath, entry), protocol, host),
+      };
     });
 
-    return createEntry(directoryPath, protocol, host, stats, null, entriesData);
+    return {
+      name: path.basename(directoryPath),
+      path: directoryPath,
+      isDirectory: true,
+      link: getEntryLink(directoryPath, protocol, host),
+      size: 0,
+      extension: "",
+      createdAt: stats.birthtime,
+      children: entriesData,
+    };
+
   } catch (err) {
     throw err;
   }
