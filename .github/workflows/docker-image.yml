@@ -14,6 +14,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install dependencies
+      run: npm ci
+    - name: Get the updated version
+      run: |
+        version=$(npm version patch)
+        updated=$(echo "$version" | cut -d " " -f 3)
+        echo "Updated version: $updated"
     - name: docker login
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -22,8 +33,7 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
     - name: Build the Docker image
       run: |
-        updated=$(date +%s)
         docker build . -t $DOCKER_USER/jobjack-server:$updated
         docker tag $DOCKER_USER/jobjack-server:$updated $DOCKER_USER/jobjack-server:latest
     - name: Docker Push
-      run: docker push peterwest86/jobjack-server
+      run: docker push $DOCKER_USER/jobjack-server
