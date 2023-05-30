@@ -1,40 +1,46 @@
-import fs from "fs";
+import fs, { type Stats } from "fs";
 import path from "path";
 import { getEntryLink } from "./getEntryLink";
+import { EntryData } from "../types";
 
-export const createDirectoryTree = async (directoryPath: string, protocol: string, host: string) => {
+export const createDirectoryTree = async (
+  directoryPath: string,
+  protocol: string,
+  host: string
+): Promise<EntryData> => {
   try {
     const stats = await fs.promises.stat(directoryPath);
 
     if (!stats.isDirectory()) {
-      throw new Error("Specified path is not a directory.");
+      return {
+        name: path.basename(directoryPath),
+        path: directoryPath,
+        isDirectory: false,
+        link: getEntryLink(directoryPath, protocol, host),
+        size: 0,
+        extension: "",
+        createdAt: stats.birthtime,
+      };
     }
 
     const entries = await fs.promises.readdir(directoryPath);
-    const statsArray = await Promise.all(
-      entries.map(async (entry) => {
-        const entryPath = path.join(directoryPath, entry);
-        const entryStats = await fs.promises.stat(entryPath);
-        return entryStats;
-      })
-    );
+    const statsArray = await Promise.all(entries.map((entry) => fs.promises.stat(path.join(directoryPath, entry))));
 
-    const entriesData = entries.map((entry, index) => {
+    const entriesData: EntryData[] = entries.map((entry, index) => {
       const stats = statsArray[index];
       const isDirectory = stats.isDirectory();
-      const entryData = {
+      return {
         name: entry,
         path: path.join(directoryPath, entry),
         size: stats.size,
         extension: path.extname(entry),
         createdAt: stats.birthtime,
-        isDirectory,
+        isDirectory: isDirectory,
         link: getEntryLink(path.join(directoryPath, entry), protocol, host),
       };
-      return entryData;
     });
 
-    const directoryTree = {
+    return {
       name: path.basename(directoryPath),
       path: directoryPath,
       isDirectory: true,
@@ -44,10 +50,7 @@ export const createDirectoryTree = async (directoryPath: string, protocol: strin
       createdAt: stats.birthtime,
       children: entriesData,
     };
-
-    return directoryTree;
-  } catch (error) {
-    console.error("Error occurred while creating directory tree:", error);
-    throw error;
+  } catch (err) {
+    throw err;
   }
 };

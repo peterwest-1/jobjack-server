@@ -17,6 +17,7 @@ app.get("/directory", async (req: Request, res: Response) => {
     const root = await createDirectoryTree(directoryPath, req.protocol, req.get("host"));
     res.json(root);
   } catch (error) {
+    //TODO: maker better
     res.status(500).json("TODO: Fix this:" + error);
   }
 });
