@@ -27,6 +27,10 @@ const main = async () => {
 
   await server.start();
 
+  app.get("/", (_, res) => {
+    res.send("Server is up!");
+  });
+
   app.use(
     "/graphql",
     cors<cors.CorsRequest>({
