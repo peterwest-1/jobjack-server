@@ -2,7 +2,7 @@ import fs, { Stats } from "fs";
 import path from "path";
 import { getEntryLink } from "./getEntryLink";
 import { createEntry } from "./createEntry";
-import { EntryData } from "../models/Entry";
+import { EntryTree } from "../models/EntryTree";
 
 //Probably doesnt even work
 //Not viable
@@ -21,7 +21,7 @@ export const createDirectoryTreeComplete = async (directoryPath: string, protoco
 
     const entryPromises = entries.map(async (entry, index) => {
       const stats = statsArray[index];
-      const entryData: EntryData = {
+      const entryData: EntryTree = {
         name: entry,
         path: path.join(directoryPath, entry),
         size: stats.size,
@@ -42,7 +42,7 @@ export const createDirectoryTreeComplete = async (directoryPath: string, protoco
 
     const entriesData = await Promise.all(entryPromises);
 
-    const directoryTree: EntryData = {
+    const directoryTree: EntryTree = {
       name: path.basename(directoryPath),
       path: directoryPath,
       isDirectory: true,

@@ -1,6 +1,6 @@
 import { ObjectType, Field } from "type-graphql";
 @ObjectType()
-export class EntryData {
+export class EntryFlat {
   @Field()
   name: string;
 
@@ -21,12 +21,6 @@ export class EntryData {
 
   @Field()
   link: string;
-
-  @Field(() => [EntryData], { nullable: true })
-  children?: EntryData[];
-
-  @Field({ nullable: true })
-  hasChildren?: boolean;
 
   @Field({ nullable: true })
   permissions?: string;
