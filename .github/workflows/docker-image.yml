@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ master ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ master ]
 
 jobs:
 
@@ -14,5 +14,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag jobjack-server:$(date +%s)
+      run: |
+        updated=$(date +%s)
+        docker build . -t ${{secrets.DOCKER_USER}}/jobjack-server:$updated
+        docker tag ${{secrets.DOCKER_USER}}/jobjack-server:$updated ${{secrets.DOCKER_USER}}/jobjack-server:latest
+    - name: Docker Push
+      run: docker push ${{secrets.DOCKER_USER}}/jobjack-server
