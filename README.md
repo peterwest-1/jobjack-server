@@ -38,7 +38,9 @@ permissions: string;
 
 ## GraphQL
 
-- [ ] If time is available, use GraphQL
+```
+It’s not possible to write a recursive query of unlimited depth. The graph of fragment spreads must not form any cycles including spreading itself. Otherwise an operation could infinitely spread or infinitely execute on cycles in the underlying data.
+```
 
 ## Issues
 

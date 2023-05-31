@@ -10,8 +10,8 @@ export class EntryData {
   @Field()
   size: number;
 
-  @Field()
-  extension: string;
+  @Field({ nullable: true })
+  extension?: string;
 
   @Field()
   createdAt: Date;
@@ -29,5 +29,5 @@ export class EntryData {
   hasChildren?: boolean;
 
   @Field({ nullable: true })
-  permissions?: boolean;
+  permissions?: string;
 }

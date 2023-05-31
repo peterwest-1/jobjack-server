@@ -2,6 +2,7 @@ import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { EntryData } from "../models/Entry";
 import { MyContext } from "../types";
 import { createDirectoryTree } from "../helpers/createDirectoryTree";
+import { createDirectoryTreeComplete } from "../helpers/createDirectoryTreeComplete";
 
 const DEFAULT_PATH = "./";
 

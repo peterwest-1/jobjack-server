@@ -1,8 +1,8 @@
 import { Stats } from "fs";
 import path from "path";
-import { EntryData } from "../types";
 import { getFilePermissionInfo } from "./filePermission";
 import { getEntryLink } from "./getEntryLink";
+import { EntryData } from "../models/Entry";
 
 export const createEntry = (
   directoryPath: string,
