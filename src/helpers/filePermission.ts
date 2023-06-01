@@ -19,26 +19,13 @@ export const getFilePermissionInfo = (permissions: number): PermissionInfo => {
   return permissionInfo;
 };
 
+//STACKOVERFLOW
 export const getPermissionDescription = (permission: number): string => {
   let description = "";
 
-  if (permission & 0o4) {
-    description += "r";
-  } else {
-    description += "-";
-  }
-
-  if (permission & 0o2) {
-    description += "w";
-  } else {
-    description += "-";
-  }
-
-  if (permission & 0o1) {
-    description += "x";
-  } else {
-    description += "-";
-  }
+  description += permission & 0o4 ? "r" : "-";
+  description += permission & 0o2 ? "w" : "-";
+  description += permission & 0o1 ? "x" : "-";
 
   return description;
 };

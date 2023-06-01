@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import "reflect-metadata";
-import { createEntryFlat } from "./createEntry";
+import { createEntry } from "./createEntry";
 import NodeCache from "node-cache";
 import { EntryFlat } from "../models/EntryFlat";
 
@@ -22,7 +22,7 @@ export const createDirectoryFlat = async (
 
   try {
     const stats = await fs.promises.stat(directoryPath);
-    const entryData = createEntryFlat(directoryPath, protocol, host, stats);
+    const entryData = createEntry(directoryPath, protocol, host, stats);
 
     if (!stats.isDirectory()) {
       flatCache.set(cacheKey, [entryData]);
