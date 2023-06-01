@@ -9,6 +9,7 @@ import "reflect-metadata";
 import { EntryResolver } from "./resolvers/EntryResolver";
 import { MyContext } from "./types";
 import { buildSchema } from "type-graphql";
+import "dotenv/config";
 
 const app = express();
 
@@ -27,10 +28,6 @@ const main = async () => {
 
   await server.start();
 
-  app.get("/", (_, res) => {
-    res.send("Server is up!");
-  });
-
   app.use(
     "/graphql",
     cors<cors.CorsRequest>({
@@ -41,6 +38,10 @@ const main = async () => {
       context: async ({ req, res }) => ({ req, res }),
     })
   );
+
+  app.get("/", (_, res) => {
+    res.send("Server is up!");
+  });
 
   const port = process.env.PORT || 3000;
 
