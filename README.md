@@ -16,7 +16,7 @@
 
   - [x] Pagination?
   - [x] Caching?
-    - [ ] Optimise searching through directories if possible
+    - [ ] Optimize searching through directories if possible
     - [ ] Current implementation is naive
 
 - Add the file permissions/attribute information to the results.
@@ -27,7 +27,7 @@
 
 - Make sure the application is containerized and can run on any system. REST or GraphQL can be used. We are a GraphQL company, but if you are unfamiliar with the subject matter, it is advisable that you use what you know best.
 
-## Developement Run
+## Development Run
 
 ```
 npm run watch && npm run dev

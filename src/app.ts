@@ -34,7 +34,7 @@ const main = async () => {
   app.use(
     "/graphql",
     cors<cors.CorsRequest>({
-      origin: ["http://localhost:4200", "https://studio.apollographql.com"],
+      origin: [process.env.CORS_ORIGIN, "https://studio.apollographql.com"],
     }),
     json(),
     expressMiddleware(server, {
@@ -42,9 +42,9 @@ const main = async () => {
     })
   );
 
-  const port = 3000;
+  const port = process.env.PORT || 3000;
 
-  app.listen({ port: 3000 }, () => {
+  app.listen({ port }, () => {
     console.log(`Server is running on http://localhost:${port}, GraphQL on http://localhost:${port}/graphql `);
   });
 };
