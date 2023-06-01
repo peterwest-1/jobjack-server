@@ -1,5 +1,9 @@
 # JobJack Server
 
+# TODO
+
+- Implement better directory traversal function
+
 ## Using
 
 - Node
