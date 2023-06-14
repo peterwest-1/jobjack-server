@@ -19,7 +19,7 @@ export const createEntry = (
     size: stats.size,
     createdAt: stats.birthtime,
     isDirectory: isDirectory,
-    permissions: getFilePermissionInfo(stats.mode).description, // Extract user permission
+    permissions: getFilePermissionInfo(stats.mode).description,
   };
 
   const entryPath = entry ? path.join(directoryPath, entry) : directoryPath;
